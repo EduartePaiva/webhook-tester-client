@@ -1,5 +1,6 @@
 import "dotenv/config";
-import { io } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
+import type { ClientToServerEvents, ServerToClientEvents } from "./types";
 
 async function main() {
     const bearer = await fetch(`${process.env.WEBHOOK_TESTER_URL!}/users/login`, {
@@ -20,11 +21,14 @@ async function main() {
         throw new Error("could not get accessToken");
     }
 
-    const socket = io(process.env.WEBHOOK_TESTER_URL!, {
-        auth: {
-            token: accessToken,
-        },
-    });
+    const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+        process.env.WEBHOOK_TESTER_URL!,
+        {
+            auth: {
+                token: accessToken,
+            },
+        }
+    );
     // socket.auth
     socket.on("connect", () => {
         console.log(`you connected with ${socket.id}`);
@@ -32,7 +36,6 @@ async function main() {
 
     socket.on("message", (data) => {
         console.log(data);
-        socket.emit("message", "hello there");
     });
 }
 
