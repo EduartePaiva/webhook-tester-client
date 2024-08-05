@@ -4,7 +4,7 @@ import type { ClientToServerEvents, ServerToClientEvents } from "./types";
 
 async function main() {
     try {
-        const bearer = await fetch(`${process.env.WEBHOOK_TESTER_URL!}/auth/login`, {
+        const response = await fetch(`${process.env.WEBHOOK_TESTER_URL!}/auth/login`, {
             method: "POST",
             body: JSON.stringify({
                 email: process.env.EMAIL!,
@@ -14,13 +14,20 @@ async function main() {
                 "content-type": "application/json; charset=utf-8",
             },
         });
-        if (bearer.status != 201) {
-            throw new Error(`bearer fetch status: ${bearer.status}, ${await bearer.text()}`);
+        if (response.status != 201) {
+            throw new Error(`Response fetch status: ${response.status}, ${await response.text()}`);
         }
-        const accessToken = (await bearer.json()).accessToken;
+        const resJson = await response.json();
+        const accessToken = resJson.accessToken;
         if (typeof accessToken !== "string") {
             throw new Error("could not get accessToken");
         }
+        const webhookURL = resJson.webhookURL;
+        if (typeof webhookURL !== "string") {
+            throw new Error("could not get webhookURL");
+        }
+        console.log(`Your webhookURL is: ${webhookURL}`);
+        console.log("Use it in your application");
 
         const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
             process.env.WEBHOOK_TESTER_URL!,
