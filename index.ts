@@ -4,7 +4,7 @@ import type { ClientToServerEvents, ServerToClientEvents } from "./types";
 
 async function main() {
     try {
-        const bearer = await fetch(`${process.env.WEBHOOK_TESTER_URL!}/auth/login`, {
+        const bearer = await fetch(`${process.env.WEBHOOK_TESTER_URL!}/api/auth/login`, {
             method: "POST",
             body: JSON.stringify({
                 email: process.env.EMAIL!,
@@ -29,6 +29,7 @@ async function main() {
                     token: accessToken,
                 },
                 transports: ["websocket"],
+                path: "/api/socket.io/",
             }
         );
         socket.on("connect_error", (error) => {
