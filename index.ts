@@ -36,6 +36,7 @@ async function main() {
                     token: accessToken,
                 },
                 transports: ["websocket"],
+                path: "/api/socket.io/",
             }
         );
         socket.on("connect_error", (error) => {
