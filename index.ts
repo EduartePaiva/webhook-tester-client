@@ -4,7 +4,7 @@ import type { ClientToServerEvents, ServerToClientEvents } from "./types";
 
 async function main() {
     try {
-        const response = await fetch(`${process.env.WEBHOOK_TESTER_URL!}/auth/login`, {
+        const response = await fetch(`${process.env.WEBHOOK_TESTER_URL!}/api/auth/login`, {
             method: "POST",
             body: JSON.stringify({
                 email: process.env.EMAIL!,
