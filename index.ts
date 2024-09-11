@@ -1,14 +1,26 @@
-import "dotenv/config";
 import { Socket, io } from "socket.io-client";
 import type { ClientToServerEvents, ServerToClientEvents } from "./types";
+import readLine from "readline-sync";
+
+const WEBHOOK_TESTER_URL = "https://webhook.eduartepaiva.com";
 
 async function main() {
     try {
-        const response = await fetch(`${process.env.WEBHOOK_TESTER_URL!}/api/auth/login`, {
+        // credentials questions, if you wish you can hardcode them.
+        const EMAIL = readLine.questionEMail("Type your email: ");
+        const PASSWORD = readLine.question("Type your password: ", {
+            hideEchoBack: true,
+        });
+        const POST_URL = readLine.question(
+            "Type the URL that the app will redirect to, for exemple (http://localhost:3000): "
+        );
+        // ---------------------
+
+        const response = await fetch(`${WEBHOOK_TESTER_URL}/api/auth/login`, {
             method: "POST",
             body: JSON.stringify({
-                email: process.env.EMAIL!,
-                password: process.env.PASSWORD!,
+                email: EMAIL,
+                password: PASSWORD,
             }),
             headers: {
                 "content-type": "application/json; charset=utf-8",
@@ -29,16 +41,13 @@ async function main() {
         console.log(`Your webhookURL is: ${webhookURL}`);
         console.log("Use it in your application");
 
-        const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-            process.env.WEBHOOK_TESTER_URL!,
-            {
-                auth: {
-                    token: accessToken,
-                },
-                transports: ["websocket"],
-                path: "/api/socket.io/",
-            }
-        );
+        const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(WEBHOOK_TESTER_URL, {
+            auth: {
+                token: accessToken,
+            },
+            transports: ["websocket"],
+            path: "/api/socket.io/",
+        });
         socket.on("connect_error", (error) => {
             // ...
             console.log("ocorreu um erro: ", error);
@@ -55,7 +64,7 @@ async function main() {
 
         socket.on("message", (data) => {
             console.log(JSON.stringify(data.payload));
-            const fetchURL = process.env.POST_URL! + data.extra_url;
+            const fetchURL = POST_URL + data.extra_url;
             console.log("Posting on URL: " + fetchURL);
 
             fetch(fetchURL, {
