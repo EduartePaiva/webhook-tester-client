@@ -50,7 +50,7 @@ async function main() {
         });
         socket.on("connect_error", (error) => {
             // ...
-            console.log("ocorreu um erro: ", error);
+            console.log("A error happened: ", error);
         });
         // socket.auth
         socket.on("connect", () => {
@@ -63,16 +63,17 @@ async function main() {
         };
 
         socket.on("message", (data) => {
-            console.log(JSON.stringify(data.payload));
+            const stringifiedData = JSON.stringify(data.payload);
+            console.log(stringifiedData);
             const fetchURL = POST_URL + data.extra_url;
             console.log("Posting on URL: " + fetchURL);
 
             fetch(fetchURL, {
                 method: "POST",
-                body: JSON.stringify(data.payload),
+                body: stringifiedData,
                 headers: headersList,
             })
-                .then((res) => console.log("O resultado do fetch: " + res.status))
+                .then((res) => console.log(`The fetch result to (${fetchURL}) was : ${res.status}`))
                 .catch((err) => console.error(err));
         });
     } catch (err) {
