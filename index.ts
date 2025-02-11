@@ -2,7 +2,7 @@ import { Socket, io } from "socket.io-client";
 import type { ClientToServerEvents, ServerToClientEvents } from "./types";
 import readLine from "readline-sync";
 
-const WEBHOOK_TESTER_URL = "https://webhook.eduartepaiva.com";
+const WEBHOOK_TESTER_URL = "https://webhook.eduarte.pro";
 
 async function main() {
     try {
@@ -27,7 +27,11 @@ async function main() {
             },
         });
         if (response.status != 201) {
-            throw new Error(`Response fetch status: ${response.status}, ${await response.text()}`);
+            throw new Error(
+                `Response fetch status: ${
+                    response.status
+                }, ${await response.text()}`
+            );
         }
         const resJson = await response.json();
         const accessToken = resJson.accessToken;
@@ -41,13 +45,16 @@ async function main() {
         console.log(`Your webhookURL is: ${webhookURL}`);
         console.log("Use it in your application");
 
-        const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(WEBHOOK_TESTER_URL, {
-            auth: {
-                token: accessToken,
-            },
-            transports: ["websocket"],
-            path: "/api/socket.io/",
-        });
+        const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+            WEBHOOK_TESTER_URL,
+            {
+                auth: {
+                    token: accessToken,
+                },
+                transports: ["websocket"],
+                path: "/api/socket.io/",
+            }
+        );
         socket.on("connect_error", (error) => {
             // ...
             console.log("A error happened: ", error);
@@ -73,7 +80,11 @@ async function main() {
                 body: stringifiedData,
                 headers: headersList,
             })
-                .then((res) => console.log(`The fetch result to (${fetchURL}) was : ${res.status}`))
+                .then((res) =>
+                    console.log(
+                        `The fetch result to (${fetchURL}) was : ${res.status}`
+                    )
+                )
                 .catch((err) => console.error(err));
         });
     } catch (err) {
